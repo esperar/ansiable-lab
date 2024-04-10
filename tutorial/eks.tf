@@ -22,3 +22,29 @@ resource "aws_iam_role_policy_attachment" "amazon_eks_cluster_policy" {
 
   role = aws_iam_role.eks_cluster.name
 }
+
+
+resource "aws_eks_cluster" "eks" {
+    name = "eks"
+
+    role_arn = aws_iam_role.eks_cluster.arn
+
+    version = "1.18"
+
+    vpc_config {
+        endpoint_private_access = false
+
+        endpoint_public_access = true
+
+        subnet_ids = [
+            aws_subnet.public_1.id,
+            aws_subnet.public_2.id,
+            aws_subnet.private_1.id,
+            aws_subnet.private_2.id
+        ]
+    }
+
+    depends_on = [
+        aws_iam_role_policy_attachment.amazon_eks_cluster_policy
+    ]
+}
